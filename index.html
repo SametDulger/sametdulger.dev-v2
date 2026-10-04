@@ -1,0 +1,5370 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color" content="#05070a">
+
+  <meta name="description" content="Samet Dülger — Yazılım geliştirici portföyü.">
+
+  <title>sametdulger.dev — Yakında...</title>
+
+
+  <!-- =========================================================
+       FAVICON
+  ========================================================== -->
+
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23070b0a'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Arial,sans-serif' font-size='36' font-weight='700' fill='%2367ffc5'%3ESD%3C/text%3E%3C/svg%3E">
+
+
+  <!-- =========================================================
+       HARİCİ KÜTÜPHANELER
+  ========================================================== -->
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.9.1/tsparticles.bundle.min.js"></script>
+
+
+  <!-- =========================================================
+       FONTLAR
+  ========================================================== -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Orbitron:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet">
+
+
+  <style>
+
+    /* =========================================================
+       DEĞİŞKENLER
+    ========================================================== */
+
+    :root {
+      --bg: #05070a;
+      --bg-soft: #080c10;
+      --panel: rgba(9, 14, 19, .78);
+      --panel-strong: rgba(7, 12, 16, .96);
+      --line: rgba(103, 255, 197, .14);
+      --line-strong: rgba(103, 255, 197, .28);
+      --green: #67ffc5;
+      --green-2: #19e89a;
+      --cyan: #65e7ff;
+      --white: #edfdf7;
+      --text: #c7d6d2;
+      --muted: #71827e;
+      --dim: #4b5d59;
+      --yellow: #f4c66d;
+      --red: #ff5577;
+      --mono: "JetBrains Mono", monospace;
+      --display: "Orbitron", sans-serif;
+      --sans: "Inter", sans-serif;
+    }
+
+
+    /* =========================================================
+       TEMEL
+    ========================================================== */
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100%;
+      overflow-x: hidden;
+
+      background:
+        radial-gradient(circle at 70% 20%,
+          rgba(103, 255, 197, .045),
+          transparent 32%),
+        radial-gradient(circle at 20% 80%,
+          rgba(101, 231, 255, .025),
+          transparent 28%),
+        var(--bg);
+
+      color: var(--white);
+      font-family: var(--sans);
+    }
+
+    body.is-booting {
+      overflow: hidden;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    ::selection {
+      background: rgba(103, 255, 197, .25);
+      color: var(--white);
+    }
+
+
+    /* =========================================================
+       ARKA PLAN
+    ========================================================== */
+
+    #particles {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .noise,
+    .scanlines,
+    .vignette {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 30;
+    }
+
+    .noise {
+      opacity: .028;
+
+      background-image:
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+    }
+
+    .scanlines {
+      opacity: .025;
+
+      background:
+        repeating-linear-gradient(to bottom,
+          transparent 0,
+          transparent 3px,
+          rgba(255, 255, 255, .07) 4px);
+    }
+
+    .vignette {
+      background:
+        radial-gradient(circle at center,
+          transparent 38%,
+          rgba(0, 0, 0, .78) 100%);
+    }
+
+    .cursor-glow {
+      position: fixed;
+      width: 360px;
+      height: 360px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      transform: translate(-50%, -50%);
+
+      background:
+        radial-gradient(circle,
+          rgba(103, 255, 197, .075),
+          transparent 68%);
+
+      filter: blur(12px);
+      opacity: 1;
+    }
+
+
+    /* =========================================================
+       BOOT EKRANI
+    ========================================================== */
+
+    .boot-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+
+      display: grid;
+      place-items: center;
+
+      padding: 24px;
+
+      background:
+        radial-gradient(circle at center,
+          #07100d 0%,
+          #020304 55%,
+          #010202 100%);
+    }
+
+    .boot-terminal {
+      width: min(820px, 100%);
+
+      color: var(--green);
+
+      font:
+        400 clamp(11px, 1.4vw, 14px) / 1.8 var(--mono);
+
+      text-shadow:
+        0 0 12px rgba(103, 255, 197, .35);
+    }
+
+    .boot-line {
+      opacity: 0;
+    }
+
+    .boot-progress {
+      width: 100%;
+      height: 4px;
+      margin-top: 20px;
+
+      overflow: hidden;
+      border-radius: 10px;
+
+      background: #101416;
+      opacity: 0;
+    }
+
+    .boot-progress i {
+      display: block;
+      width: 0;
+      height: 100%;
+
+      background:
+        linear-gradient(90deg,
+          var(--green-2),
+          var(--cyan));
+
+      box-shadow: 0 0 18px var(--green);
+    }
+
+
+    /* =========================================================
+       UYGULAMA
+    ========================================================== */
+
+    .app {
+      position: relative;
+      z-index: 2;
+
+      min-height: 100vh;
+
+      display: flex;
+      flex-direction: column;
+
+      visibility: hidden;
+      opacity: 0;
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================== */
+
+    header {
+      width: min(1240px, calc(100% - 40px));
+      margin: 0 auto;
+      padding: 20px 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+
+      font-family: var(--display);
+      font-weight: 800;
+      letter-spacing: .08em;
+      font-size: 14px;
+    }
+
+    .brand-mark {
+      position: relative;
+
+      width: 42px;
+      height: 42px;
+
+      display: grid;
+      place-items: center;
+
+      border: 1px solid rgba(103, 255, 197, .5);
+
+      color: var(--green);
+
+      background: rgba(103, 255, 197, .035);
+
+      box-shadow:
+        inset 0 0 25px rgba(103, 255, 197, .05),
+        0 0 25px rgba(103, 255, 197, .06);
+
+      font-family: var(--display);
+
+      overflow: hidden;
+    }
+
+    .brand-mark::after {
+      content: "";
+
+      position: absolute;
+      inset: -80%;
+
+      background:
+        linear-gradient(115deg,
+          transparent 45%,
+          rgba(255, 255, 255, .4),
+          transparent 55%);
+
+      transform: translateX(-70%) rotate(15deg);
+
+      animation: shine 3.5s infinite;
+    }
+
+    @keyframes shine {
+
+      0%,
+      60% {
+        transform: translateX(-70%) rotate(15deg);
+      }
+
+      100% {
+        transform: translateX(70%) rotate(15deg);
+      }
+    }
+
+    .brand-domain {
+      color: #9aaca8;
+    }
+
+    .status {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+
+      color: var(--muted);
+
+      font:
+        500 11px var(--mono);
+
+      letter-spacing: .08em;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: var(--green);
+
+      box-shadow: 0 0 15px var(--green);
+
+      animation: blink 1.2s infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: .25;
+        transform: scale(.7);
+      }
+    }
+
+
+    /* =========================================================
+       ANA ALAN
+    ========================================================== */
+
+    main {
+      width: min(1240px, calc(100% - 40px));
+      margin: auto;
+
+      flex: 1;
+
+      display: grid;
+
+      grid-template-columns:
+        minmax(0, 1fr) minmax(430px, .95fr);
+
+      gap: 70px;
+
+      align-items: center;
+
+      padding: 20px 0 50px;
+    }
+
+
+    /* =========================================================
+       HERO
+    ========================================================== */
+
+    .eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      margin-bottom: 18px;
+
+      color: var(--green);
+
+      font:
+        600 11px var(--mono);
+
+      letter-spacing: .18em;
+    }
+
+    .eyebrow::before {
+      content: "";
+
+      width: 34px;
+      height: 1px;
+
+      background: var(--green);
+
+      box-shadow: 0 0 12px var(--green);
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 850px;
+
+      font-family: var(--display);
+
+      font-size: clamp(40px, 6vw, 76px);
+
+      line-height: .98;
+      letter-spacing: -.055em;
+
+      font-weight: 800;
+    }
+
+    .glitch {
+      position: relative;
+      display: inline-block;
+
+      color: var(--white);
+
+      text-shadow:
+        0 0 28px rgba(103, 255, 197, .11);
+
+      will-change: transform;
+    }
+
+    .glitch::before,
+    .glitch::after {
+      content: attr(data-text);
+
+      position: absolute;
+      inset: 0;
+
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .glitch::before {
+      color: #ff2c62;
+    }
+
+    .glitch::after {
+      color: var(--cyan);
+    }
+
+    .glitch:hover::before {
+      opacity: .7;
+      animation: glitchA .25s steps(2) infinite;
+    }
+
+    .glitch:hover::after {
+      opacity: .7;
+      animation: glitchB .22s steps(2) infinite;
+    }
+
+    @keyframes glitchA {
+      0% {
+        transform: translate(0);
+        clip-path: inset(0 0 75% 0);
+      }
+
+      50% {
+        transform: translate(-4px, 2px);
+        clip-path: inset(40% 0 20% 0);
+      }
+
+      100% {
+        transform: translate(3px, -1px);
+        clip-path: inset(70% 0 0 0);
+      }
+    }
+
+    @keyframes glitchB {
+      0% {
+        transform: translate(0);
+        clip-path: inset(65% 0 0 0);
+      }
+
+      50% {
+        transform: translate(4px, -2px);
+        clip-path: inset(10% 0 55% 0);
+      }
+
+      100% {
+        transform: translate(-2px, 1px);
+        clip-path: inset(35% 0 30% 0);
+      }
+    }
+
+    .subtitle {
+      max-width: 720px;
+
+      margin: 20px 0 0;
+
+      color: #9eafab;
+
+      font-size: clamp(15px, 1.8vw, 18px);
+
+      line-height: 1.7;
+    }
+
+    .subtitle strong {
+      color: var(--white);
+    }
+
+    .comment {
+      display: block;
+
+      margin-top: 14px;
+
+      color: var(--green);
+
+      font:
+        500 12px/1.7 var(--mono);
+    }
+
+
+    /* =========================================================
+       BUTONLAR
+    ========================================================== */
+
+    .cta-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      margin-top: 28px;
+
+      flex-wrap: wrap;
+    }
+
+    .cta {
+      position: relative;
+
+      border: 1px solid rgba(103, 255, 197, .42);
+
+      background: rgba(103, 255, 197, .055);
+
+      color: var(--green);
+
+      padding: 13px 18px;
+
+      cursor: pointer;
+      text-decoration: none;
+
+      font:
+        700 11px var(--mono);
+
+      letter-spacing: .06em;
+
+      overflow: hidden;
+      isolation: isolate;
+
+      transition:
+        transform .25s ease,
+        box-shadow .25s ease,
+        color .25s ease;
+    }
+
+    .cta::before {
+      content: "";
+
+      position: absolute;
+      inset: 0;
+
+      background: var(--green);
+
+      transform: translateY(102%);
+
+      transition: transform .25s ease;
+
+      z-index: -1;
+    }
+
+    .cta:hover {
+      color: #03100b;
+
+      transform: translateY(-2px);
+
+      box-shadow:
+        0 0 35px rgba(103, 255, 197, .15);
+    }
+
+    .cta:hover::before {
+      transform: translateY(0);
+    }
+
+    .cta:focus-visible {
+      outline: 1px solid var(--green);
+      outline-offset: 3px;
+    }
+
+    .cta.secondary {
+      border-color: rgba(255, 255, 255, .1);
+
+      color: #82938f;
+
+      background: rgba(255, 255, 255, .02);
+    }
+
+
+    /* =========================================================
+       GERİ SAYIM
+    ========================================================== */
+
+    .countdown-wrap {
+      margin-top: 30px;
+    }
+
+    .counter-label {
+      margin-bottom: 7px;
+
+      color: #53635f;
+
+      font:
+        10px var(--mono);
+
+      letter-spacing: .1em;
+    }
+
+    .countdown {
+      color: var(--green);
+
+      font-family: var(--display);
+
+      font-size: clamp(20px, 3.5vw, 34px);
+
+      letter-spacing: .06em;
+
+      text-shadow:
+        0 0 24px rgba(103, 255, 197, .15);
+    }
+
+
+    /* =========================================================
+       TERMINAL
+    ========================================================== */
+
+    .terminal {
+      position: relative;
+
+      width: 100%;
+      min-width: 0;
+
+      height: 410px;
+      min-height: 410px;
+      max-height: 410px;
+
+      display: flex;
+      flex-direction: column;
+
+      border:
+        1px solid rgba(103, 255, 197, .16);
+
+      background:
+        linear-gradient(145deg,
+          rgba(10, 17, 21, .96),
+          rgba(4, 8, 11, .92));
+
+      box-shadow:
+        0 0 45px rgba(25, 232, 154, .09);
+
+      overflow: hidden;
+
+      transform-style: preserve-3d;
+      will-change: transform;
+    }
+
+    .terminal::before {
+      content: "";
+
+      position: absolute;
+      inset: 0;
+
+      background:
+        linear-gradient(rgba(103, 255, 197, .025) 1px,
+          transparent 1px),
+        linear-gradient(90deg,
+          rgba(103, 255, 197, .025) 1px,
+          transparent 1px);
+
+      background-size: 24px 24px;
+
+      mask-image:
+        linear-gradient(to bottom,
+          black,
+          transparent);
+
+      pointer-events: none;
+    }
+
+    .terminal::after {
+      content: "";
+
+      position: absolute;
+
+      left: 0;
+      right: 0;
+      top: 42px;
+
+      height: 1px;
+
+      background:
+        linear-gradient(90deg,
+          transparent,
+          rgba(103, 255, 197, .3),
+          transparent);
+
+      opacity: .5;
+
+      pointer-events: none;
+    }
+
+    .terminal-top {
+      position: relative;
+      z-index: 2;
+
+      flex: 0 0 42px;
+
+      height: 42px;
+      min-height: 42px;
+
+      display: flex;
+      align-items: center;
+
+      padding: 0 15px;
+
+      border-bottom:
+        1px solid rgba(103, 255, 197, .09);
+
+      background:
+        rgba(5, 9, 12, .55);
+    }
+
+    .terminal-dots {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .terminal-dots span {
+      display: block;
+
+      width: 8px;
+      height: 8px;
+
+      border-radius: 50%;
+
+      background: #303b38;
+    }
+
+    .terminal-dots span:nth-child(2) {
+      background: #4d5c55;
+    }
+
+    .terminal-dots span:nth-child(3) {
+      background: #61756c;
+    }
+
+    .terminal-title {
+      margin-left: auto;
+
+      max-width: 70%;
+
+      overflow: hidden;
+
+      white-space: nowrap;
+      text-overflow: ellipsis;
+
+      color: #52645f;
+
+      font:
+        10px var(--mono);
+    }
+
+    .terminal-body {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      flex: 1 1 0;
+      min-height: 0;
+      height: 0;
+      padding: 21px;
+      color: #718781;
+      font: 12px/1.75 var(--mono);
+      overflow-y: auto;
+      overflow-x: hidden;
+      overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-gutter: stable;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(103, 255, 197, .28) transparent;
+    }
+
+    .terminal-body::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .terminal-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .terminal-body::-webkit-scrollbar-thumb {
+      background: rgba(103, 255, 197, .25);
+      border-radius: 999px;
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .terminal-body::-webkit-scrollbar-thumb:hover {
+      background: rgba(103, 255, 197, .45);
+      border: 2px solid transparent;
+      background-clip: padding-box;
+    }
+
+    .terminal-line {
+      display: grid;
+      grid-template-columns: max-content minmax(0, 1fr);
+      column-gap: 10px;
+      width: 100%;
+      min-width: 0;
+      margin-bottom: 2px;
+      flex: 0 0 auto;
+    }
+
+    .terminal-line>span:last-child {
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .prompt {
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    .command {
+      color: #d5e5e0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .command-output {
+      min-width: 0;
+      color: #d5e5e0;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+    .terminal-response {
+      min-width: 0;
+    }
+
+    .terminal-command-live {
+      min-width: 0;
+    }
+
+    .terminal-command-live .command {
+      min-width: 0;
+    }
+
+    .ok {
+      color: #b8d8cf;
+    }
+
+    .warning {
+      color: var(--yellow);
+    }
+
+    .progress-text {
+      color: var(--green);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: clip;
+      letter-spacing: -1px;
+    }
+
+    .mini-progress {
+      width: 100%;
+      height: 6px;
+      margin: 6px 0 15px;
+      border: 1px solid rgba(103, 255, 197, .14);
+      background: #080d0e;
+      overflow: hidden;
+      flex: 0 0 auto;
+    }
+
+    .mini-progress i {
+      display: block;
+      width: 91%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--green-2), var(--cyan));
+      box-shadow: 0 0 14px rgba(103, 255, 197, .35);
+      animation: progressPulse 2.4s ease-in-out infinite alternate;
+    }
+
+    @keyframes progressPulse {
+      to {
+        width: 97%;
+        filter: brightness(1.2);
+      }
+    }
+
+    .typing {
+      margin-top: 2px;
+    }
+
+    .typing-target {
+      color: #d5e5e0;
+      min-width: 0;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+
+
+    /* =========================================================
+       GERÇEK TERMİNAL İMLECİ
+       
+       ÖNEMLİ:
+       İmleç artık .typing::after DEĞİL.
+       Doğrudan .prompt elementinin içindedir.
+       
+       Böylece CSS Grid'in ikinci kolonuna gitmez.
+       Sonuç:
+       
+       samet@dev:~$▋
+    ========================================================== */
+
+    .terminal-cursor {
+      display: inline-block;
+
+      width: .58em;
+      height: 1.05em;
+
+      margin-left: 3px;
+
+      vertical-align: -.15em;
+
+      background: var(--green);
+
+      box-shadow:
+        0 0 8px rgba(103, 255, 197, .65);
+
+      animation:
+        terminalCursor .7s steps(1) infinite;
+    }
+
+    @keyframes terminalCursor {
+      50% {
+        opacity: 0;
+      }
+    }
+
+
+    /* =========================================================
+       KOMUT YAZILIRKENKİ İMLEÇ
+       
+       Butona basıldığında oluşturulan canlı komut satırında
+       imleç komutun hemen sonunda görünür.
+    ========================================================== */
+
+    .terminal-command-live.typing::after {
+      content: "▋";
+
+      color: var(--green);
+
+      animation:
+        terminalCursor .7s steps(1) infinite;
+
+      margin-left: 2px;
+    }
+
+
+    /* =========================================================
+       METRİKLER
+    ========================================================== */
+
+    .metrics {
+      width: min(1240px, calc(100% - 40px));
+      margin: 0 auto 20px;
+
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, 1fr);
+
+      gap: 10px;
+    }
+
+    .metric {
+      position: relative;
+
+      overflow: hidden;
+
+      padding: 14px 15px;
+
+      border:
+        1px solid rgba(103, 255, 197, .09);
+
+      background:
+        rgba(7, 12, 15, .48);
+    }
+
+    .metric::after {
+      content: "";
+
+      position: absolute;
+
+      width: 45%;
+      height: 1px;
+
+      left: -60%;
+      bottom: 0;
+
+      background: var(--green);
+
+      box-shadow: 0 0 15px var(--green);
+
+      animation: scan 3.2s linear infinite;
+    }
+
+    @keyframes scan {
+      to {
+        left: 120%;
+      }
+    }
+
+    .metric-label {
+      color: #5c716b;
+
+      font:
+        10px var(--mono);
+
+      letter-spacing: .12em;
+    }
+
+    .metric-value {
+      margin-top: 6px;
+
+      color: #c4d5d0;
+
+      font:
+        700 14px var(--mono);
+    }
+
+    .metric-value b {
+      color: var(--green);
+    }
+
+
+    /* =========================================================
+       FOOTER
+    ========================================================== */
+
+    footer {
+      width: min(1240px, calc(100% - 40px));
+      margin: 0 auto;
+
+      padding: 0 0 18px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      color: #4c5e59;
+
+      font:
+        10px var(--mono);
+
+      letter-spacing: .08em;
+    }
+
+
+    /* =========================================================
+       YÜZEN ETİKETLER
+    ========================================================== */
+
+    .floating-chip {
+      position: fixed;
+      z-index: 1;
+
+      padding: 7px 10px;
+
+      border:
+        1px solid rgba(103, 255, 197, .1);
+
+      color:
+        rgba(103, 255, 197, .3);
+
+      background:
+        rgba(3, 7, 9, .42);
+
+      font:
+        9px var(--mono);
+
+      pointer-events: none;
+
+      backdrop-filter: blur(5px);
+    }
+
+    .chip-1 {
+      top: 23%;
+      left: 3%;
+
+      transform: rotate(-8deg);
+    }
+
+    .chip-2 {
+      top: 71%;
+      right: 3%;
+
+      transform: rotate(7deg);
+    }
+
+    .chip-3 {
+      top: 14%;
+      right: 13%;
+
+      transform: rotate(-4deg);
+    }
+
+
+    /* =========================================================
+       CHATBOT
+    ========================================================== */
+
+    .chatbot {
+      position: fixed;
+
+      right: 24px;
+      bottom: 24px;
+
+      z-index: 60;
+
+      width: 360px;
+      max-width: calc(100vw - 30px);
+
+      font-family: var(--mono);
+
+      filter:
+        drop-shadow(0 15px 45px rgba(0, 0, 0, .45));
+    }
+
+    .chat-toggle {
+      margin-left: auto;
+
+      width: 58px;
+      height: 58px;
+
+      display: grid;
+      place-items: center;
+
+      border:
+        1px solid rgba(103, 255, 197, .45);
+
+      border-radius: 50%;
+
+      color: var(--green);
+
+      background:
+        rgba(5, 12, 14, .94);
+
+      box-shadow:
+        0 0 30px rgba(103, 255, 197, .12),
+        inset 0 0 20px rgba(103, 255, 197, .04);
+
+      cursor: pointer;
+
+      transition:
+        transform .25s ease,
+        box-shadow .25s ease;
+    }
+
+    .chat-toggle:hover {
+      transform: translateY(-3px) scale(1.04);
+
+      box-shadow:
+        0 0 42px rgba(103, 255, 197, .24);
+    }
+
+    .chat-toggle:focus-visible {
+      outline: 1px solid var(--green);
+      outline-offset: 4px;
+    }
+
+    .chat-icon {
+      position: relative;
+
+      width: 22px;
+      height: 17px;
+
+      border:
+        1px solid var(--green);
+
+      border-radius: 4px;
+    }
+
+    .chat-icon::before {
+      content: "";
+
+      position: absolute;
+
+      width: 5px;
+      height: 5px;
+
+      left: 4px;
+      top: 5px;
+
+      background: var(--green);
+
+      box-shadow:
+        8px 0 0 var(--green);
+    }
+
+    .chat-icon::after {
+      content: "";
+
+      position: absolute;
+
+      bottom: -4px;
+      left: 4px;
+
+      border-style: solid;
+      border-width: 4px 4px 0 0;
+      border-color:
+        var(--green) transparent transparent transparent;
+    }
+
+    .chat-notification {
+      position: absolute;
+
+      top: -2px;
+      right: -2px;
+
+      width: 17px;
+      height: 17px;
+
+      display: grid;
+      place-items: center;
+
+      border:
+        2px solid #05070a;
+
+      border-radius: 50%;
+
+      background: var(--green);
+      color: #03100b;
+
+      font:
+        800 8px var(--sans);
+    }
+
+    .chat-panel {
+      position: absolute;
+
+      right: 0;
+      bottom: 72px;
+
+      width: 360px;
+      max-width: 100%;
+
+      overflow: hidden;
+
+      border:
+        1px solid rgba(103, 255, 197, .2);
+
+      background:
+        rgba(5, 10, 13, .97);
+
+      box-shadow:
+        0 0 60px rgba(0, 0, 0, .5),
+        0 0 30px rgba(103, 255, 197, .06);
+
+      backdrop-filter: blur(18px);
+
+      transform-origin: bottom right;
+
+      opacity: 0;
+      visibility: hidden;
+
+      transform:
+        translateY(15px) scale(.94);
+
+      transition:
+        opacity .25s ease,
+        visibility .25s ease,
+        transform .25s ease;
+    }
+
+    .chatbot.open .chat-panel {
+      opacity: 1;
+      visibility: visible;
+
+      transform:
+        translateY(0) scale(1);
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+
+      padding: 13px 14px;
+
+      border-bottom:
+        1px solid rgba(103, 255, 197, .1);
+
+      background:
+        linear-gradient(90deg,
+          rgba(103, 255, 197, .045),
+          transparent);
+    }
+
+    .chat-avatar {
+      position: relative;
+
+      width: 35px;
+      height: 35px;
+
+      flex: 0 0 35px;
+
+      display: grid;
+      place-items: center;
+
+      border:
+        1px solid rgba(103, 255, 197, .4);
+
+      color: var(--green);
+
+      background:
+        rgba(103, 255, 197, .045);
+
+      font:
+        700 11px var(--mono);
+    }
+
+    .chat-avatar::after {
+      content: "";
+
+      position: absolute;
+
+      right: -3px;
+      bottom: -3px;
+
+      width: 8px;
+      height: 8px;
+
+      border:
+        2px solid #050a0d;
+
+      border-radius: 50%;
+
+      background: var(--green);
+
+      box-shadow:
+        0 0 10px var(--green);
+    }
+
+    .chat-title {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .chat-title strong {
+      display: block;
+
+      color: #d9ebe6;
+
+      font:
+        700 11px var(--mono);
+
+      letter-spacing: .03em;
+    }
+
+    .chat-title span {
+      display: block;
+
+      margin-top: 3px;
+
+      color: #5f716c;
+
+      font:
+        9px var(--mono);
+    }
+
+    .chat-close {
+      width: 28px;
+      height: 28px;
+
+      border:
+        1px solid rgba(255, 255, 255, .07);
+
+      background:
+        rgba(255, 255, 255, .025);
+
+      color: #61736e;
+
+      cursor: pointer;
+
+      transition:
+        color .2s ease,
+        border-color .2s ease;
+    }
+
+    .chat-close:hover {
+      color: var(--green);
+
+      border-color:
+        rgba(103, 255, 197, .25);
+    }
+
+    .chat-close:focus-visible {
+      outline: 1px solid var(--green);
+      outline-offset: 2px;
+    }
+
+    .chat-messages {
+      height: 300px;
+
+      padding: 15px;
+
+      overflow-y: auto;
+
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+      scrollbar-width: thin;
+
+      scrollbar-color:
+        rgba(103, 255, 197, .25) transparent;
+    }
+
+    .chat-message {
+      display: flex;
+      width: 100%;
+
+      animation:
+        chatMessageIn .25s ease-out;
+    }
+
+    @keyframes chatMessageIn {
+      from {
+        opacity: 0;
+        transform: translateY(7px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .chat-message.bot {
+      justify-content: flex-start;
+    }
+
+    .chat-message.user {
+      justify-content: flex-end;
+    }
+
+    .chat-bubble {
+      max-width: 86%;
+
+      padding: 9px 11px;
+
+      border:
+        1px solid rgba(103, 255, 197, .09);
+
+      color: #9cafaa;
+
+      background:
+        rgba(255, 255, 255, .025);
+
+      font:
+        10px/1.65 var(--mono);
+
+      overflow-wrap: anywhere;
+    }
+
+    .chat-message.bot .chat-bubble {
+      border-color:
+        rgba(103, 255, 197, .13);
+
+      background:
+        rgba(103, 255, 197, .035);
+
+      color: #b8cbc5;
+    }
+
+    .chat-message.user .chat-bubble {
+      border-color:
+        rgba(101, 231, 255, .13);
+
+      background:
+        rgba(101, 231, 255, .035);
+
+      color: #a9cbd0;
+    }
+
+    .chat-label {
+      display: block;
+
+      margin-bottom: 4px;
+
+      color: var(--green);
+
+      font:
+        700 8px var(--mono);
+
+      letter-spacing: .1em;
+    }
+
+    .chat-message.user .chat-label {
+      color: var(--cyan);
+      text-align: right;
+    }
+
+    .chat-typing {
+      display: inline-flex;
+
+      align-items: center;
+      gap: 4px;
+
+      padding: 10px 12px;
+
+      border:
+        1px solid rgba(103, 255, 197, .1);
+
+      background:
+        rgba(103, 255, 197, .025);
+    }
+
+    .chat-typing i {
+      width: 4px;
+      height: 4px;
+
+      border-radius: 50%;
+
+      background: var(--green);
+
+      animation:
+        typingDot 1s infinite;
+    }
+
+    .chat-typing i:nth-child(2) {
+      animation-delay: .15s;
+    }
+
+    .chat-typing i:nth-child(3) {
+      animation-delay: .3s;
+    }
+
+    @keyframes typingDot {
+
+      0%,
+      60%,
+      100% {
+        opacity: .25;
+        transform: translateY(0);
+      }
+
+      30% {
+        opacity: 1;
+        transform: translateY(-3px);
+      }
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 7px;
+
+      padding: 11px;
+
+      border-top:
+        1px solid rgba(103, 255, 197, .1);
+
+      background:
+        rgba(0, 0, 0, .16);
+    }
+
+    .chat-input {
+      flex: 1;
+      min-width: 0;
+
+      border:
+        1px solid rgba(103, 255, 197, .1);
+
+      outline: none;
+
+      padding: 10px;
+
+      color: #c8d9d4;
+
+      background:
+        rgba(255, 255, 255, .025);
+
+      font:
+        10px var(--mono);
+
+      transition:
+        border-color .2s ease,
+        box-shadow .2s ease;
+    }
+
+    .chat-input::placeholder {
+      color: #455650;
+    }
+
+    .chat-input:focus {
+      border-color:
+        rgba(103, 255, 197, .3);
+
+      box-shadow:
+        0 0 15px rgba(103, 255, 197, .05);
+    }
+
+    .chat-send {
+      width: 42px;
+
+      border:
+        1px solid rgba(103, 255, 197, .3);
+
+      color: var(--green);
+
+      background:
+        rgba(103, 255, 197, .045);
+
+      cursor: pointer;
+
+      font:
+        700 12px var(--mono);
+
+      transition:
+        background .2s ease,
+        color .2s ease,
+        transform .2s ease;
+    }
+
+    .chat-send:hover {
+      color: #03100b;
+      background: var(--green);
+
+      transform: translateY(-1px);
+    }
+
+    .chat-send:disabled,
+    .chat-input:disabled {
+      cursor: not-allowed;
+      opacity: .55;
+    }
+
+    .chat-footer {
+      padding: 0 12px 9px;
+
+      color: #3f504c;
+
+      font:
+        8px var(--mono);
+
+      text-align: center;
+    }
+
+
+    /* =========================================================
+       RESPONSIVE
+    ========================================================== */
+
+    @media (max-width: 1100px) {
+
+      main {
+        grid-template-columns:
+          minmax(0, 1fr) minmax(390px, .9fr);
+
+        gap: 45px;
+      }
+
+    }
+
+
+    @media (max-width: 1000px) {
+
+      main {
+        grid-template-columns: 1fr;
+        gap: 40px;
+        padding-top: 25px;
+      }
+
+      .terminal {
+        height: 380px;
+        min-height: 380px;
+        max-height: 380px;
+      }
+
+    }
+
+
+    @media (max-width: 900px) {
+
+      .metrics {
+        grid-template-columns:
+          repeat(2, 1fr);
+      }
+
+      .chip-3 {
+        display: none;
+      }
+
+    }
+
+
+    @media (max-width: 600px) {
+
+      header,
+      main,
+      .metrics,
+      footer {
+        width:
+          min(calc(100% - 28px), 1240px);
+      }
+
+      header {
+        padding-top: 16px;
+      }
+
+      .status,
+      .brand-domain {
+        display: none;
+      }
+
+      h1 {
+        font-size:
+          clamp(34px, 13vw, 58px);
+      }
+
+      .subtitle {
+        font-size: 14px;
+      }
+
+      .comment {
+        font-size: 10px;
+      }
+
+      .cta-row {
+        gap: 8px;
+      }
+
+      .cta {
+        width: 100%;
+        text-align: center;
+      }
+
+      .terminal {
+        height: 390px;
+        min-height: 390px;
+        max-height: 390px;
+      }
+
+      .terminal-body {
+        padding: 15px;
+        font-size: 10px;
+        line-height: 1.8;
+      }
+
+      .terminal-line {
+        grid-template-columns:
+          max-content minmax(0, 1fr);
+
+        column-gap: 7px;
+      }
+
+      .terminal-title {
+        font-size: 9px;
+      }
+
+      .progress-text {
+        letter-spacing: -1.5px;
+      }
+
+      .metrics {
+        gap: 7px;
+      }
+
+      .metric {
+        padding: 11px;
+      }
+
+      .metric-value {
+        font-size: 11px;
+      }
+
+      footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .floating-chip {
+        display: none;
+      }
+
+      .chatbot {
+        right: 14px;
+        bottom: 14px;
+
+        width:
+          calc(100vw - 28px);
+      }
+
+      .chat-panel {
+        width: 100%;
+        bottom: 70px;
+      }
+
+      .chat-toggle {
+        width: 54px;
+        height: 54px;
+      }
+
+      .chat-messages {
+        height: 270px;
+      }
+
+    }
+
+
+    /* =========================================================
+       HAREKET AZALTMA
+    ========================================================== */
+
+    @media (prefers-reduced-motion: reduce) {
+
+      html {
+        scroll-behavior: auto !important;
+      }
+
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+
+      .cursor-glow {
+        display: none;
+      }
+
+    }
+
+  </style>
+
+</head>
+
+
+<body class="is-booting">
+
+
+  <!-- =========================================================
+       BOOT
+  ========================================================== -->
+
+  <div class="boot-screen" id="bootScreen" aria-hidden="true">
+
+    <div class="boot-terminal">
+
+      <div class="boot-line">
+        SAMETDULGER.DEV // PORTFÖY SİSTEMİ v2.0
+      </div>
+
+      <div class="boot-line">
+        ------------------------------------------------
+      </div>
+
+      <div class="boot-line">
+        [ OK ] Çalışma ortamı başlatılıyor...
+      </div>
+
+      <div class="boot-line">
+        [ OK ] Geliştirici profili yükleniyor...
+      </div>
+
+      <div class="boot-line">
+        [ OK ] Projeler taranıyor...
+      </div>
+
+      <div class="boot-line">
+        [ OK ] Mimari diyagramların gerçekten bitmiş olduğu varsayılıyor...
+      </div>
+
+      <div class="boot-line">
+        [WARN] Proje kapsamı %347 oranında büyüdü.
+      </div>
+
+      <div class="boot-line">
+        [WARN] "Bir özellik daha ekleyelim" isteği algılandı.
+      </div>
+
+      <div class="boot-line">
+        [ OK ] Production deploy güvenli bir şekilde ertelendi.
+      </div>
+
+      <div class="boot-line" id="bootFinal">
+        SİSTEM HAZIR_
+      </div>
+
+      <div class="boot-progress">
+        <i></i>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================================
+       ARKA PLAN
+  ========================================================== -->
+
+  <div id="particles"></div>
+
+  <div class="cursor-glow" id="cursorGlow"></div>
+
+  <div class="noise"></div>
+
+  <div class="scanlines"></div>
+
+  <div class="vignette"></div>
+
+
+  <!-- =========================================================
+       YÜZEN ETİKETLER
+  ========================================================== -->
+
+  <div class="floating-chip chip-1">
+    BUILD: 0.9.∞
+  </div>
+
+  <div class="floating-chip chip-2">
+    git durumu: duygusal olarak kararsız
+  </div>
+
+  <div class="floating-chip chip-3">
+    ORTAM: localhost → bir gün production
+  </div>
+
+
+  <!-- =========================================================
+       UYGULAMA
+  ========================================================== -->
+
+  <div class="app">
+
+
+    <!-- =======================================================
+         HEADER
+    ======================================================== -->
+
+    <header>
+
+      <div class="brand">
+
+        <div class="brand-mark">
+          SD
+        </div>
+
+        <span class="brand-domain">
+          sametdulger.dev
+        </span>
+
+      </div>
+
+
+      <div class="status">
+
+        <span class="status-dot"></span>
+
+        SİSTEM ÇALIŞIYOR · ŞİMDİLİK
+
+      </div>
+
+    </header>
+
+
+    <!-- =======================================================
+         ANA
+    ======================================================== -->
+
+    <main>
+
+
+      <!-- =====================================================
+           HERO
+      ====================================================== -->
+
+      <section class="hero">
+
+        <div class="eyebrow">
+          YAZILIM GELİŞTİRİCİ // PORTFÖY
+        </div>
+
+
+        <h1>
+
+          <span class="glitch" data-text="ÇOK YAKINDA.">
+            ÇOK YAKINDA.
+          </span>
+
+        </h1>
+
+
+        <p class="subtitle">
+
+          <strong>
+            sametdulger.dev
+          </strong>
+
+          üzerinde gerçek projeler,
+          yazılım mimarileri ve bazen neden
+          çalıştığını bizim de tam olarak
+          anlayamadığımız kodlar geliştiriliyor.
+
+        </p>
+
+
+        <span class="comment">
+
+          // Sistem geliştiriliyor.
+          <br>
+          // Buglar biliniyor. Bazıları özellik olarak kabul edildi.
+          <br>
+          // Bazı özellikler neden eklendiği bilinmeden yaşamaya devam ediyor.
+          <br>
+          // Production'a hazır mıyız? Henüz değil.
+          <br>
+          // Deploy tarihi: kader belirleyecek.
+          <br>
+          // Son değişiklik: “son değişiklik” değildi.
+
+        </span>
+
+
+        <div class="cta-row">
+
+          <button class="cta" id="terminalBtn" type="button">
+            [ SİSTEMİ İNCELE ]
+          </button>
+
+
+          <button class="cta secondary" id="hackBtn" type="button">
+            [ PRODUCTION'I TEST ET ]
+          </button>
+
+        </div>
+
+
+        <div class="countdown-wrap">
+
+          <div class="counter-label">
+            TAHMİNİ YAYIN DURUMU ·
+            TARİH VARMIŞ GİBİ DAVRANIYORUZ
+          </div>
+
+          <div class="countdown" id="countdown">
+            -- : -- : -- : --
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =====================================================
+           TERMINAL
+      ====================================================== -->
+
+      <section class="terminal" id="terminal">
+
+        <div class="terminal-top">
+
+          <div class="terminal-dots">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+          </div>
+
+
+          <div class="terminal-title">
+            samet@dev:~/portfolio
+          </div>
+
+        </div>
+
+
+        <div class="terminal-body" id="terminalBody">
+
+          <div class="terminal-line">
+            <span class="prompt">samet@dev:~$</span>
+            <span class="command">./portfoy --durum</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">&gt;</span>
+            <span>Geliştirici profili yükleniyor...</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">&gt;</span>
+            <span class="ok">✓ Backend sistemleri</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">&gt;</span>
+            <span class="ok">✓ Frontend uygulamaları</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">&gt;</span>
+            <span class="ok">✓ API tasarımı</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">&gt;</span>
+            <span class="ok">✓ Veritabanı mimarisi</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">&gt;</span>
+            <span class="warning">⚠ Kapsam beklenenden fazla büyüdü.</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">&gt;</span>
+            <span class="warning">⚠ "Bir özellik daha ekleyelim" tespit edildi.</span>
+          </div>
+
+          <br>
+
+          <div class="terminal-line">
+            <span class="prompt">DERLEME</span>
+            <span class="progress-text">██████████████████████░░</span>
+          </div>
+
+          <div class="mini-progress">
+            <i></i>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">PROJE</span>
+            <span>%91 tamamlandı · kalan %9 kritik</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">BUGLAR</span>
+            <span>Takip ediliyor · bazıları bizi takip ediyor</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">DOKÜMANTASYON</span>
+            <span>"Yakında tamamlanacak"</span>
+          </div>
+
+          <div class="terminal-line">
+            <span class="prompt">PRODUCTION</span>
+            <span class="ok">Hazır · ama önce bir kez daha test edelim</span>
+          </div>
+
+          <br>
+
+
+          <!-- ===================================================
+               EN ALTTAKİ BOŞ PROMPT
+               
+               İMLEÇ ARTIK PROMPT'UN İÇİNDE.
+               
+               ESKİ:
+               <span class="prompt">samet@dev:~$</span>
+               <span class="typing-target"></span>
+               + .typing::after
+
+               YENİ:
+               samet@dev:~$<span class="terminal-cursor"></span>
+               
+               Böylece imleç kesin olarak promptun hemen
+               yanında görünür.
+          ==================================================== -->
+
+          <div class="terminal-line typing" id="terminalTyping">
+
+            <span class="prompt">samet@dev:~$<span
+                class="terminal-cursor"
+                aria-hidden="true"></span></span>
+
+            <span class="typing-target"></span>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+
+    <!-- =======================================================
+         METRİKLER
+    ======================================================== -->
+
+    <div class="metrics">
+
+      <div class="metric">
+
+        <div class="metric-label">
+          SİSTEM
+        </div>
+
+        <div class="metric-value">
+          <b>ÇALIŞIYOR</b> · şimdilik
+        </div>
+
+      </div>
+
+
+      <div class="metric">
+
+        <div class="metric-label">
+          KOD
+        </div>
+
+        <div class="metric-value">
+          <b>GELİŞTİRİLİYOR</b> · sürekli
+        </div>
+
+      </div>
+
+
+      <div class="metric">
+
+        <div class="metric-label">
+          BUGLAR
+        </div>
+
+        <div class="metric-value">
+          <b>ÇÖZÜLÜYOR</b> · bitmez
+        </div>
+
+      </div>
+
+
+      <div class="metric">
+
+        <div class="metric-label">
+          DEPLOY
+        </div>
+
+        <div class="metric-value">
+          <b>YAKINDA</b> · söz vermiyoruz
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =======================================================
+         FOOTER
+    ======================================================== -->
+
+    <footer>
+
+      <span>
+
+        ©
+
+        <span id="year"></span>
+
+        SAMET DÜLGER
+
+      </span>
+
+
+      <span>
+        .NET · REACT ·
+        FAZLA FAZLA İTERASYON
+      </span>
+
+    </footer>
+
+
+  </div>
+
+
+  <!-- =========================================================
+       CHATBOT
+  ========================================================== -->
+
+  <div class="chatbot" id="chatbot">
+
+    <div class="chat-panel">
+
+      <div class="chat-header">
+
+        <div class="chat-avatar">
+          AI
+        </div>
+
+
+        <div class="chat-title">
+
+          <strong>
+            PORTFÖY ASİSTANI
+          </strong>
+
+          <span>
+            cevap verme isteği: düşük
+          </span>
+
+        </div>
+
+
+        <button
+          class="chat-close"
+          id="chatClose"
+          type="button"
+          aria-label="Chatbotu kapat">
+          ×
+        </button>
+
+      </div>
+
+
+      <div class="chat-messages" id="chatMessages">
+
+        <div class="chat-message bot">
+
+          <div class="chat-bubble">
+
+            <span class="chat-label">
+              BOT
+            </span>
+
+            Merhaba. Sana yardımcı olmak için buradayım.
+            Ne sormak istersen sor; cevap vermek isteyip
+            istemediğim konusu biraz daha karmaşık.
+            Muhtemelen yine de cevap vereceğim.
+            En azından arayüz profesyonel görünüyor.
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="chat-input-area">
+
+        <input
+          type="text"
+          id="chatInput"
+          class="chat-input"
+          placeholder="Bir şey sor..."
+          autocomplete="off"
+          maxlength="300">
+
+
+        <button
+          class="chat-send"
+          id="chatSend"
+          type="button"
+          aria-label="Mesaj gönder">
+          →
+        </button>
+
+      </div>
+
+
+      <div class="chat-footer">
+        API: yok · zekâ: tartışmalı · özgüven: yüksek
+      </div>
+
+    </div>
+
+
+    <button
+      class="chat-toggle"
+      id="chatToggle"
+      type="button"
+      aria-label="Chatbotu aç"
+      aria-expanded="false">
+
+      <span class="chat-icon"></span>
+
+      <span class="chat-notification">
+        1
+      </span>
+
+    </button>
+
+  </div>
+
+
+  <!-- =========================================================
+       JAVASCRIPT
+  ========================================================== -->
+
+  <script>
+
+    (() => {
+
+      "use strict";
+
+
+      /* =======================================================
+         GSAP / PLUGIN KONTROLÜ
+      ======================================================== */
+
+      if (
+        typeof window.gsap === "undefined"
+      ) {
+
+        console.error(
+          "GSAP yüklenemedi."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        typeof window.ScrollToPlugin !== "undefined"
+      ) {
+
+        gsap.registerPlugin(
+          ScrollToPlugin
+        );
+
+      }
+
+
+      /* =======================================================
+         YARDIMCI FONKSİYONLAR
+      ======================================================== */
+
+      const $ =
+        (selector) =>
+          document.querySelector(selector);
+
+
+      const $$ =
+        (selector) =>
+          [...document.querySelectorAll(selector)];
+
+
+      const prefersReducedMotion =
+        window.matchMedia(
+          "(prefers-reduced-motion: reduce)"
+        ).matches;
+
+
+      const isTouchDevice =
+        window.matchMedia(
+          "(hover: none), (pointer: coarse)"
+        ).matches;
+
+
+      const safeSetText =
+        (selector, value) => {
+
+          const element =
+            $(selector);
+
+          if (element) {
+            element.textContent = value;
+          }
+
+        };
+
+
+      safeSetText(
+        "#year",
+        new Date().getFullYear()
+      );
+
+
+      /* =======================================================
+         ELEMENTLER
+      ======================================================== */
+
+      const bootScreen =
+        $("#bootScreen");
+
+      const bootLines =
+        $$(".boot-line");
+
+      const bootProgress =
+        $(".boot-progress");
+
+      const bootBar =
+        $(".boot-progress i");
+
+      const app =
+        $(".app");
+
+      const terminal =
+        $("#terminal");
+
+      const terminalButton =
+        $("#terminalBtn");
+
+      const hackButton =
+        $("#hackBtn");
+
+      const terminalTyping =
+        $("#terminalTyping");
+
+      const typingTarget =
+        terminalTyping
+          ? terminalTyping.querySelector(
+            ".typing-target"
+          )
+          : null;
+
+      const countdown =
+        $("#countdown");
+
+      const glow =
+        $("#cursorGlow");
+
+      const chatbot =
+        $("#chatbot");
+
+      const chatToggle =
+        $("#chatToggle");
+
+      const chatClose =
+        $("#chatClose");
+
+      const chatInput =
+        $("#chatInput");
+
+      const chatSend =
+        $("#chatSend");
+
+      const chatMessages =
+        $("#chatMessages");
+
+      const notification =
+        document.querySelector(
+          ".chat-notification"
+        );
+
+
+      /* =======================================================
+         BOOT
+      ======================================================== */
+
+      let bootFinished =
+        false;
+
+      let particlesInitialized =
+        false;
+
+
+      document.body.classList.add(
+        "is-booting"
+      );
+
+
+      document.body.style.overflow =
+        "hidden";
+
+
+      if (app) {
+
+        gsap.set(
+          app,
+          {
+            autoAlpha: 0
+          }
+        );
+
+      }
+
+
+      function introAnimation() {
+
+        if (!app) {
+          return;
+        }
+
+
+        if (
+          prefersReducedMotion
+        ) {
+
+          gsap.set(
+            app,
+            {
+              autoAlpha: 1
+            }
+          );
+
+          return;
+
+        }
+
+
+        const introTl =
+          gsap.timeline({
+            defaults: {
+              ease:
+                "power3.out"
+            }
+          });
+
+
+        introTl
+
+          .from(
+            "header",
+            {
+              y: -25,
+              opacity: 0,
+              duration: .7
+            }
+          )
+
+          .from(
+            ".hero > *",
+            {
+              y: 28,
+              opacity: 0,
+              duration: .7,
+              stagger: .07
+            },
+            "-=.4"
+          )
+
+          .from(
+            ".terminal",
+            {
+              x: 40,
+              opacity: 0,
+              rotateY: 6,
+              duration: .9
+            },
+            "-=.45"
+          )
+
+          .from(
+            ".metric",
+            {
+              y: 18,
+              opacity: 0,
+              duration: .55,
+              stagger: .06
+            },
+            "-=.35"
+          );
+
+      }
+
+
+      function finishBoot() {
+
+        if (
+          bootFinished
+        ) {
+          return;
+        }
+
+
+        bootFinished =
+          true;
+
+
+        if (app) {
+
+          gsap.set(
+            app,
+            {
+              autoAlpha: 1
+            }
+          );
+
+        }
+
+
+        document.body.classList.remove(
+          "is-booting"
+        );
+
+
+        document.body.style.overflow =
+          "";
+
+
+        initParticles();
+
+
+        introAnimation();
+
+
+        if (!bootScreen) {
+          return;
+        }
+
+
+        if (
+          prefersReducedMotion
+        ) {
+
+          bootScreen.remove();
+
+          return;
+
+        }
+
+
+        gsap.to(
+          bootScreen,
+          {
+            autoAlpha: 0,
+            duration: .55,
+            ease: "power2.inOut",
+
+            onComplete: () => {
+
+              if (
+                bootScreen.isConnected
+              ) {
+
+                bootScreen.remove();
+
+              }
+
+            }
+
+          }
+        );
+
+      }
+
+
+      if (
+        bootScreen &&
+        bootLines.length &&
+        bootProgress &&
+        bootBar
+      ) {
+
+        if (
+          prefersReducedMotion
+        ) {
+
+          bootLines.forEach(
+            (line) => {
+
+              gsap.set(
+                line,
+                {
+                  opacity: 1
+                }
+              );
+
+            }
+          );
+
+
+          gsap.set(
+            bootProgress,
+            {
+              opacity: 1
+            }
+          );
+
+
+          gsap.set(
+            bootBar,
+            {
+              width: "100%"
+            }
+          );
+
+
+          gsap.set(
+            "#bootFinal",
+            {
+              color: "#65e7ff",
+              textShadow:
+                "0 0 22px rgba(101,231,255,.6)"
+            }
+          );
+
+
+          finishBoot();
+
+        } else {
+
+          const bootTl =
+            gsap.timeline({
+              defaults: {
+                ease:
+                  "power2.out"
+              }
+            });
+
+
+          bootLines.forEach(
+            (line, index) => {
+
+              bootTl.to(
+                line,
+                {
+                  opacity: 1,
+                  duration: .12,
+                  delay:
+                    index === 0
+                      ? .15
+                      : .14
+                }
+              );
+
+            }
+          );
+
+
+          bootTl
+
+            .to(
+              bootProgress,
+              {
+                opacity: 1,
+                duration: .2
+              }
+            )
+
+            .to(
+              bootBar,
+              {
+                width: "100%",
+                duration: 1.2,
+                ease:
+                  "power2.inOut"
+              }
+            )
+
+            .to(
+              "#bootFinal",
+              {
+                color: "#65e7ff",
+                duration: .2,
+                textShadow:
+                  "0 0 22px rgba(101,231,255,.6)"
+              }
+            );
+
+
+          bootTl.add(
+            finishBoot
+          );
+
+        }
+
+      } else {
+
+        finishBoot();
+
+      }
+
+
+      /* =======================================================
+         PARTICLES
+      ======================================================== */
+
+      function initParticles() {
+
+        if (
+          particlesInitialized
+        ) {
+          return;
+        }
+
+
+        if (
+          prefersReducedMotion
+        ) {
+          return;
+        }
+
+
+        if (
+          !window.tsParticles
+        ) {
+          return;
+        }
+
+
+        const particlesElement =
+          $("#particles");
+
+
+        if (
+          !particlesElement
+        ) {
+          return;
+        }
+
+
+        if (
+          particlesElement.querySelector(
+            "canvas"
+          )
+        ) {
+
+          particlesInitialized =
+            true;
+
+          return;
+
+        }
+
+
+        particlesInitialized =
+          true;
+
+
+        tsParticles.load({
+
+          id: "particles",
+
+          options: {
+
+            fullScreen: {
+              enable: false
+            },
+
+            background: {
+              color: "transparent"
+            },
+
+            fpsLimit: 60,
+
+            particles: {
+
+              number: {
+
+                value: 48,
+
+                density: {
+                  enable: true,
+                  area: 1100
+                }
+
+              },
+
+              color: {
+                value: [
+                  "#67ffc5",
+                  "#65e7ff"
+                ]
+              },
+
+              opacity: {
+
+                value: {
+                  min: .06,
+                  max: .22
+                },
+
+                animation: {
+                  enable: true,
+                  speed: .3,
+                  minimumValue: .03
+                }
+
+              },
+
+              size: {
+
+                value: {
+                  min: .5,
+                  max: 1.6
+                }
+
+              },
+
+              move: {
+
+                enable: true,
+                speed: .2,
+                direction: "none",
+                random: true,
+                straight: false,
+
+                outModes: {
+                  default: "out"
+                }
+
+              },
+
+              links: {
+
+                enable: true,
+                distance: 145,
+                color: "#67ffc5",
+                opacity: .055,
+                width: 1
+
+              }
+
+            },
+
+            interactivity: {
+
+              detectsOn: "window",
+
+              events: {
+
+                onHover: {
+                  enable: true,
+                  mode: "grab"
+                },
+
+                resize: true
+
+              },
+
+              modes: {
+
+                grab: {
+
+                  distance: 170,
+
+                  links: {
+                    opacity: .16
+                  }
+
+                }
+
+              }
+
+            },
+
+            detectRetina: true
+
+          }
+
+        }).catch(
+          (error) => {
+
+            particlesInitialized =
+              false;
+
+            console.warn(
+              "Particles başlatılamadı:",
+              error
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =======================================================
+         İMLEÇ IŞIĞI
+      ======================================================== */
+
+      if (
+        glow &&
+        !prefersReducedMotion &&
+        !isTouchDevice
+      ) {
+
+        window.addEventListener(
+          "pointermove",
+          (event) => {
+
+            gsap.to(
+              glow,
+              {
+                x: event.clientX,
+                y: event.clientY,
+                duration: .5,
+                ease: "power3.out",
+                overwrite: "auto"
+              }
+            );
+
+          },
+          {
+            passive: true
+          }
+        );
+
+      }
+
+
+      /* =======================================================
+         TERMINAL 3D
+      ======================================================== */
+
+      if (
+        terminal &&
+        !prefersReducedMotion &&
+        !isTouchDevice
+      ) {
+
+        terminal.addEventListener(
+          "pointermove",
+          (event) => {
+
+            const rect =
+              terminal.getBoundingClientRect();
+
+
+            if (
+              !rect.width ||
+              !rect.height
+            ) {
+              return;
+            }
+
+
+            const x =
+              (
+                event.clientX -
+                rect.left
+              )
+              /
+              rect.width
+              -
+              .5;
+
+
+            const y =
+              (
+                event.clientY -
+                rect.top
+              )
+              /
+              rect.height
+              -
+              .5;
+
+
+            gsap.to(
+              terminal,
+              {
+                rotateY: x * 6,
+                rotateX: -y * 6,
+                transformPerspective: 900,
+                duration: .35,
+                ease: "power2.out",
+                overwrite: "auto"
+              }
+            );
+
+          }
+        );
+
+
+        terminal.addEventListener(
+          "pointerleave",
+          () => {
+
+            gsap.to(
+              terminal,
+              {
+                rotateY: 0,
+                rotateX: 0,
+                duration: .7,
+                ease: "elastic.out(1,.5)"
+              }
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =======================================================
+         GERİ SAYIM
+      ======================================================== */
+
+      let launchTime =
+        0;
+
+
+      const storedKey =
+        "sametdulger_launch_time";
+
+
+      try {
+
+        launchTime =
+          Number(
+            localStorage.getItem(
+              storedKey
+            )
+          );
+
+
+        if (
+          !Number.isFinite(
+            launchTime
+          ) ||
+          launchTime < Date.now()
+        ) {
+
+          launchTime =
+            Date.now()
+            +
+            14
+            *
+            24
+            *
+            60
+            *
+            60
+            *
+            1000;
+
+
+          localStorage.setItem(
+            storedKey,
+            String(launchTime)
+          );
+
+        }
+
+      } catch (error) {
+
+        launchTime =
+          Date.now()
+          +
+          14
+          *
+          24
+          *
+          60
+          *
+          60
+          *
+          1000;
+
+      }
+
+
+      function updateCountdown() {
+
+        if (!countdown) {
+          return;
+        }
+
+
+        const diff =
+          Math.max(
+            0,
+            launchTime - Date.now()
+          );
+
+
+        const days =
+          Math.floor(
+            diff / 86400000
+          );
+
+
+        const hours =
+          Math.floor(
+            (
+              diff %
+              86400000
+            ) / 3600000
+          );
+
+
+        const mins =
+          Math.floor(
+            (
+              diff %
+              3600000
+            ) / 60000
+          );
+
+
+        const secs =
+          Math.floor(
+            (
+              diff %
+              60000
+            ) / 1000
+          );
+
+
+        countdown.textContent =
+
+          `${String(days).padStart(2, "0")} : ` +
+
+          `${String(hours).padStart(2, "0")} : ` +
+
+          `${String(mins).padStart(2, "0")} : ` +
+
+          `${String(secs).padStart(2, "0")}`;
+
+      }
+
+
+      updateCountdown();
+
+
+      const countdownInterval =
+        setInterval(
+          updateCountdown,
+          1000
+        );
+
+
+      /* =======================================================
+         TERMINAL
+      ======================================================== */
+
+      let typingTimeout = null;
+
+      let typingRunId = 0;
+
+      let terminalActionRunId = 0;
+
+      let terminalResponseTimeout = null;
+
+      let terminalLiveLine = null;
+
+
+      /* =======================================================
+         TERMINAL PROMPTU EN ALTA TAŞI
+      ======================================================== */
+
+      function moveTypingPromptToBottom() {
+
+        if (
+          !terminalTyping ||
+          !terminalBody
+        ) {
+          return;
+        }
+
+
+        /*
+         * Prompt her zaman terminal body'sinin son çocuğu olur.
+         * Böylece terminale yeni satırlar eklense bile
+         * boş prompt ve imleç fiziksel olarak en altta kalır.
+         */
+        terminalBody.appendChild(
+          terminalTyping
+        );
+
+
+        /*
+         * Promptun içeriği kesinlikle boş tutulur.
+         * Cursor prompt elementinin içindedir.
+         */
+        if (typingTarget) {
+
+          typingTarget.textContent =
+            "";
+
+        }
+
+
+        scrollTerminalToBottom(
+          true,
+          false
+        );
+
+      }
+
+
+      /* =======================================================
+         TERMINAL TYPING TEMİZLEME
+      ======================================================== */
+
+      function clearTerminalTyping() {
+
+        typingRunId++;
+
+
+        if (
+          typingTimeout !== null
+        ) {
+
+          clearTimeout(
+            typingTimeout
+          );
+
+          typingTimeout =
+            null;
+
+        }
+
+
+        if (
+          terminalResponseTimeout !== null
+        ) {
+
+          clearTimeout(
+            terminalResponseTimeout
+          );
+
+          terminalResponseTimeout =
+            null;
+
+        }
+
+
+        if (
+          terminalLiveLine &&
+          terminalLiveLine.isConnected
+        ) {
+
+          terminalLiveLine.remove();
+
+        }
+
+
+        terminalLiveLine =
+          null;
+
+
+        if (
+          typingTarget
+        ) {
+
+          typingTarget.textContent =
+            "";
+
+        }
+
+
+        moveTypingPromptToBottom();
+
+      }
+
+
+      /* =======================================================
+         TERMINAL SCROLL
+      ======================================================== */
+
+      function isTerminalNearBottom(
+        body,
+        threshold = 50
+      ) {
+
+        if (!body) {
+          return true;
+        }
+
+
+        const distanceFromBottom =
+          body.scrollHeight -
+          body.scrollTop -
+          body.clientHeight;
+
+
+        return distanceFromBottom <= threshold;
+
+      }
+
+
+      function scrollTerminalToBottom(
+        force = false,
+        smooth = false
+      ) {
+
+        const body =
+          document.querySelector(
+            "#terminalBody"
+          );
+
+
+        if (!body) {
+          return;
+        }
+
+
+        if (
+          !force &&
+          !isTerminalNearBottom(body)
+        ) {
+
+          return;
+
+        }
+
+
+        const behavior =
+          prefersReducedMotion || !smooth
+            ? "auto"
+            : "smooth";
+
+
+        body.scrollTo({
+
+          top:
+            body.scrollHeight,
+
+          behavior
+
+        });
+
+      }
+
+
+      /* =======================================================
+         TERMINAL LINE
+      ======================================================== */
+
+      function appendTerminalLine(
+        prompt,
+        className = "",
+        text = ""
+      ) {
+
+        const body =
+          document.querySelector(
+            "#terminalBody"
+          );
+
+
+        if (!body) {
+          return null;
+        }
+
+
+        const line =
+          document.createElement(
+            "div"
+          );
+
+
+        line.className =
+          `terminal-line ${className}`.trim();
+
+
+        const promptEl =
+          document.createElement(
+            "span"
+          );
+
+
+        promptEl.className =
+          "prompt";
+
+
+        promptEl.textContent =
+          prompt;
+
+
+        const textEl =
+          document.createElement(
+            "span"
+          );
+
+
+        textEl.className =
+          "command-output";
+
+
+        textEl.textContent =
+          text;
+
+
+        line.appendChild(
+          promptEl
+        );
+
+
+        line.appendChild(
+          textEl
+        );
+
+
+        body.appendChild(
+          line
+        );
+
+
+        moveTypingPromptToBottom();
+
+
+        scrollTerminalToBottom(
+          true,
+          false
+        );
+
+
+        return textEl;
+
+      }
+
+
+      /* =======================================================
+         TERMINAL RESPONSE
+      ======================================================== */
+
+      function appendTerminalResponse(
+        lines,
+        tone = "ok"
+      ) {
+
+        const body =
+          document.querySelector(
+            "#terminalBody"
+          );
+
+
+        if (!body) {
+          return;
+        }
+
+
+        if (
+          terminalLiveLine
+        ) {
+
+          terminalLiveLine.classList.remove(
+            "typing"
+          );
+
+        }
+
+
+        lines.forEach(
+          (message) => {
+
+            const line =
+              document.createElement(
+                "div"
+              );
+
+
+            line.className =
+              "terminal-line terminal-response";
+
+
+            const prompt =
+              document.createElement(
+                "span"
+              );
+
+
+            prompt.className =
+              "prompt";
+
+
+            prompt.textContent =
+              ">";
+
+
+            const text =
+              document.createElement(
+                "span"
+              );
+
+
+            text.className =
+              tone;
+
+
+            text.textContent =
+              message;
+
+
+            line.appendChild(
+              prompt
+            );
+
+
+            line.appendChild(
+              text
+            );
+
+
+            body.appendChild(
+              line
+            );
+
+          }
+        );
+
+
+        terminalLiveLine =
+          null;
+
+
+        moveTypingPromptToBottom();
+
+      }
+
+
+      /* =======================================================
+         TERMINAL COMMAND TYPING
+      ======================================================== */
+
+      function typeTerminalCommand(
+        command,
+        onComplete
+      ) {
+
+        const body =
+          document.querySelector(
+            "#terminalBody"
+          );
+
+
+        if (!body) {
+          return;
+        }
+
+
+        if (
+          terminalTyping &&
+          terminalTyping.isConnected
+        ) {
+
+          terminalTyping.remove();
+
+        }
+
+
+        typingRunId++;
+
+        const currentRun =
+          typingRunId;
+
+
+        const line =
+          document.createElement(
+            "div"
+          );
+
+
+        line.className =
+          "terminal-line terminal-command-live typing";
+
+
+        const prompt =
+          document.createElement(
+            "span"
+          );
+
+
+        prompt.className =
+          "prompt";
+
+
+        prompt.textContent =
+          "samet@dev:~$";
+
+
+        const output =
+          document.createElement(
+            "span"
+          );
+
+
+        output.className =
+          "command";
+
+
+        line.appendChild(
+          prompt
+        );
+
+
+        line.appendChild(
+          output
+        );
+
+
+        body.appendChild(
+          line
+        );
+
+
+        terminalLiveLine =
+          line;
+
+
+        scrollTerminalToBottom(
+          true,
+          false
+        );
+
+
+        let index =
+          0;
+
+
+        const type =
+          () => {
+
+            if (
+              currentRun !==
+              typingRunId
+            ) {
+
+              return;
+
+            }
+
+
+            if (
+              index <
+              command.length
+            ) {
+
+              output.textContent +=
+                command[index++];
+
+
+              scrollTerminalToBottom(
+                true,
+                false
+              );
+
+
+              typingTimeout =
+                setTimeout(
+                  type,
+                  prefersReducedMotion
+                    ? 0
+                    : 28
+                );
+
+
+              return;
+
+            }
+
+
+            typingTimeout =
+              null;
+
+
+            if (
+              currentRun ===
+              typingRunId
+            ) {
+
+              if (
+                typeof onComplete ===
+                "function"
+              ) {
+
+                onComplete();
+
+              }
+
+            }
+
+          };
+
+
+        typingTimeout =
+          setTimeout(
+            type,
+            prefersReducedMotion
+              ? 0
+              : 180
+          );
+
+      }
+
+
+      /* =======================================================
+         TERMINAL KOMUTLARI
+      ======================================================== */
+
+      const systemChecks = [
+
+        {
+          command:
+            "git status --short && dotnet build --configuration Release",
+
+          response: [
+            "✓ Git temiz. Şüpheli sessizlik tespit edildi.",
+            "✓ .NET build başarılı. Derleyici bugün kavga çıkarmadı.",
+            "→ Sonuç: sistem incelendi, ego %3 arttı."
+          ]
+
+        },
+
+
+        {
+          command:
+            "dotnet test --configuration Release && npm run build",
+
+          response: [
+            "✓ Backend testleri geçti.",
+            "✓ React production build hazır.",
+            "→ Sonuç: testler yeşil. Şimdilik kimse production'a dokunmasın."
+          ]
+
+        },
+
+
+        {
+          command:
+            "docker compose config && docker compose ps",
+
+          response: [
+            "✓ Docker yapılandırması okunabilir durumda.",
+            "✓ Container'lar birbirini tanıyor. Bu beklenmedik derecede olumlu.",
+            "→ Sonuç: sistem çalışıyor. Birinin 'bir özellik daha' demesi bekleniyor."
+          ]
+
+        }
+
+      ];
+
+
+      const productionChecks = [
+
+        {
+          command:
+            "curl -fsS /health && dotnet test --configuration Release",
+
+          response: [
+            "✓ /health → 200 OK",
+            "✓ Production testleri geçti.",
+            "→ Sonuç: production hâlâ hayatta. Dokunmuyoruz."
+          ]
+
+        },
+
+
+        {
+          command:
+            "npm run build && docker compose config --quiet",
+
+          response: [
+            "✓ Frontend bundle başarıyla üretildi.",
+            "✓ Docker config geçerli.",
+            "→ Sonuç: deploy edilebilir. Ama deploy tuşuna basacak kişi aranıyor."
+          ]
+
+        },
+
+
+        {
+          command:
+            "git diff --check && dotnet build --configuration Release",
+
+          response: [
+            "✓ Git whitespace kontrolü temiz.",
+            "✓ Release build başarılı.",
+            "→ Sonuç: production stabil. Buglar toplantıya çağrıldı, gelmediler."
+          ]
+
+        }
+
+      ];
+
+
+      /* =======================================================
+         TERMINAL ACTION
+      ======================================================== */
+
+      function runTerminalAction(
+        action
+      ) {
+
+        terminalActionRunId++;
+
+        const currentActionRun =
+          terminalActionRunId;
+
+
+        if (
+          terminalResponseTimeout !== null
+        ) {
+
+          clearTimeout(
+            terminalResponseTimeout
+          );
+
+          terminalResponseTimeout =
+            null;
+
+        }
+
+
+        clearTerminalTyping();
+
+
+        const command =
+          action.command;
+
+
+        typeTerminalCommand(
+          command,
+          () => {
+
+            if (
+              currentActionRun !==
+              terminalActionRunId
+            ) {
+
+              return;
+
+            }
+
+
+            if (
+              terminalResponseTimeout !== null
+            ) {
+
+              clearTimeout(
+                terminalResponseTimeout
+              );
+
+              terminalResponseTimeout =
+                null;
+
+            }
+
+
+            terminalResponseTimeout =
+              setTimeout(
+                () => {
+
+                  terminalResponseTimeout =
+                    null;
+
+
+                  if (
+                    currentActionRun !==
+                    terminalActionRunId
+                  ) {
+
+                    return;
+
+                  }
+
+
+                  appendTerminalResponse(
+                    action.response,
+                    "ok"
+                  );
+
+
+                  if (
+                    !prefersReducedMotion &&
+                    terminal
+                  ) {
+
+                    gsap.fromTo(
+                      terminal,
+                      {
+                        boxShadow:
+                          "0 0 0 rgba(103,255,197,0)"
+                      },
+                      {
+                        boxShadow:
+                          "0 0 55px rgba(103,255,197,.22)",
+
+                        duration:
+                          .3,
+
+                        yoyo:
+                          true,
+
+                        repeat:
+                          2,
+
+                        overwrite:
+                          "auto"
+                      }
+                    );
+
+                  }
+
+                },
+
+                prefersReducedMotion
+                  ? 0
+                  : 260
+
+              );
+
+          }
+
+        );
+
+      }
+
+
+      /* =======================================================
+         TERMİNAL BUTONU
+      ======================================================== */
+
+      if (
+        terminalButton
+      ) {
+
+        terminalButton.addEventListener(
+          "click",
+          () => {
+
+            if (
+              terminal
+            ) {
+
+              if (
+                typeof window.ScrollToPlugin !==
+                "undefined" &&
+                typeof gsap !==
+                "undefined"
+              ) {
+
+                gsap.to(
+                  window,
+                  {
+                    duration:
+                      prefersReducedMotion
+                        ? 0
+                        : 1,
+
+                    scrollTo: {
+                      y:
+                        terminal,
+
+                      offsetY:
+                        70
+                    },
+
+                    ease:
+                      "power3.inOut"
+                  }
+                );
+
+              } else {
+
+                terminal.scrollIntoView({
+                  behavior:
+                    prefersReducedMotion
+                      ? "auto"
+                      : "smooth",
+
+                  block:
+                    "start"
+                });
+
+              }
+
+            }
+
+
+            const action =
+              systemChecks[
+              Math.floor(
+                Math.random() *
+                systemChecks.length
+              )
+              ];
+
+
+            runTerminalAction(
+              action
+            );
+
+
+            terminalButton.textContent =
+              "[ SİSTEM İNCELENİYOR... ]";
+
+
+            setTimeout(
+              () => {
+
+                terminalButton.textContent =
+                  "[ SİSTEMİ İNCELE ]";
+
+              },
+
+              prefersReducedMotion
+                ? 350
+                : 1900
+
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =======================================================
+         PRODUCTION BUTONU
+      ======================================================== */
+
+      let productionAnimationRunning =
+        false;
+
+
+      if (
+        hackButton
+      ) {
+
+        hackButton.addEventListener(
+          "click",
+          (event) => {
+
+            if (
+              productionAnimationRunning
+            ) {
+
+              return;
+
+            }
+
+
+            productionAnimationRunning =
+              true;
+
+
+            const button =
+              event.currentTarget;
+
+
+            button.textContent =
+              "[ PRODUCTION TEST EDİLİYOR... ]";
+
+
+            const action =
+              productionChecks[
+              Math.floor(
+                Math.random() *
+                productionChecks.length
+              )
+              ];
+
+
+            runTerminalAction(
+              action
+            );
+
+
+            if (
+              terminal
+            ) {
+
+              if (
+                typeof window.ScrollToPlugin !==
+                "undefined" &&
+                typeof gsap !==
+                "undefined"
+              ) {
+
+                gsap.to(
+                  window,
+                  {
+                    duration:
+                      prefersReducedMotion
+                        ? 0
+                        : .8,
+
+                    scrollTo: {
+                      y:
+                        terminal,
+
+                      offsetY:
+                        70
+                    },
+
+                    ease:
+                      "power3.inOut"
+                  }
+                );
+
+              } else {
+
+                terminal.scrollIntoView({
+                  behavior:
+                    prefersReducedMotion
+                      ? "auto"
+                      : "smooth",
+
+                  block:
+                    "start"
+                });
+
+              }
+
+            }
+
+
+            if (
+              !prefersReducedMotion
+            ) {
+
+              gsap.to(
+                ".metric",
+                {
+                  y:
+                    -5,
+
+                  duration:
+                    .12,
+
+                  stagger:
+                    .04,
+
+                  yoyo:
+                    true,
+
+                  repeat:
+                    3,
+
+                  ease:
+                    "power2.inOut"
+                }
+              );
+
+
+              gsap.to(
+                ".mini-progress i",
+                {
+                  width:
+                    "100%",
+
+                  duration:
+                    .7,
+
+                  ease:
+                    "power3.out"
+                }
+              );
+
+
+              gsap.fromTo(
+                "body",
+                {
+                  filter:
+                    "brightness(1)"
+                },
+                {
+                  filter:
+                    "brightness(1.16)",
+
+                  duration:
+                    .12,
+
+                  yoyo:
+                    true,
+
+                  repeat:
+                    3,
+
+                  onComplete: () => {
+
+                    gsap.set(
+                      "body",
+                      {
+                        filter:
+                          "brightness(1)"
+                      }
+                    );
+
+                  }
+
+                }
+              );
+
+
+              for (
+                let i = 0;
+                i < 18;
+                i++
+              ) {
+
+                const bit =
+                  document.createElement(
+                    "div"
+                  );
+
+
+                bit.textContent =
+                  [
+                    "200 OK",
+                    "HEALTH",
+                    "BUILD",
+                    "TEST PASS",
+                    "DEPLOY"
+                  ][
+                  Math.floor(
+                    Math.random() *
+                    5
+                  )
+                  ];
+
+
+                Object.assign(
+                  bit.style,
+                  {
+                    position:
+                      "fixed",
+
+                    left:
+                      "50%",
+
+                    top:
+                      "50%",
+
+                    zIndex:
+                      "99",
+
+                    color:
+                      i % 2 === 0
+                        ? "#67ffc5"
+                        : "#65e7ff",
+
+                    font:
+                      "11px JetBrains Mono, monospace",
+
+                    fontWeight:
+                      "700",
+
+                    pointerEvents:
+                      "none"
+                  }
+                );
+
+
+                document.body.appendChild(
+                  bit
+                );
+
+
+                const angle =
+                  Math.random() *
+                  Math.PI *
+                  2;
+
+
+                const distance =
+                  100 +
+                  Math.random() *
+                  350;
+
+
+                gsap.to(
+                  bit,
+                  {
+                    x:
+                      Math.cos(angle) *
+                      distance,
+
+                    y:
+                      Math.sin(angle) *
+                      distance,
+
+                    opacity:
+                      0,
+
+                    rotation:
+                      Math.random() *
+                      180,
+
+                    duration:
+                      .6 +
+                      Math.random() *
+                      .5,
+
+                    ease:
+                      "power2.out",
+
+                    onComplete: () => {
+
+                      bit.remove();
+
+                    }
+
+                  }
+                );
+
+              }
+
+            }
+
+
+            setTimeout(
+              () => {
+
+                button.textContent =
+                  "[ PRODUCTION'I TEST ET ]";
+
+
+                productionAnimationRunning =
+                  false;
+
+              },
+
+              prefersReducedMotion
+                ? 500
+                : 2200
+
+            );
+
+          }
+        );
+
+      }
+
+
+      /* =======================================================
+         TERMİNAL DURUMLARI
+
+         Status mesajları artık boş promptun içine yazılmaz.
+
+         Terminalin altında daima:
+
+         samet@dev:~$▋
+
+         bulunur.
+      ======================================================== */
+
+      const statuses = [
+
+        "Repository durumu kontrol ediliyor...",
+
+        "Eski dependency neden hâlâ burada diye düşünülüyor...",
+
+        "Mimari ile gerçek sistem karşılaştırılıyor...",
+
+        "Gereksinimler yeniden değerlendiriliyor...",
+
+        "Localhost'ta çalışıyor. Şimdilik yeterli.",
+
+        "Bir özellik daha eklenerek kapsam genişletiliyor...",
+
+        "Production öncesi son test çalıştırılıyor...",
+
+        "Son değişikliğin gerçekten son değişiklik olup olmadığı kontrol ediliyor...",
+
+        "Kod gözden geçiriliyor. Kod da bizi gözden geçiriyor...",
+
+        "Deploy planı yapılıyor. Plan tekrar değiştiriliyor..."
+
+      ];
+
+
+      let statusInterval =
+        null;
+
+
+      /* =======================================================
+         GLITCH
+      ======================================================== */
+
+      let glitchInterval =
+        null;
+
+
+      if (
+        !prefersReducedMotion
+      ) {
+
+        glitchInterval =
+          setInterval(
+            () => {
+
+              const titles =
+                document.querySelectorAll(
+                  ".glitch"
+                );
+
+
+              if (
+                !titles.length
+              ) {
+
+                return;
+
+              }
+
+
+              const target =
+                titles[
+                Math.floor(
+                  Math.random() *
+                  titles.length
+                )
+                ];
+
+
+              gsap.timeline()
+
+                .to(
+                  target,
+                  {
+                    x: -4,
+                    duration: .04
+                  }
+                )
+
+                .to(
+                  target,
+                  {
+                    x: 4,
+                    duration: .04
+                  }
+                )
+
+                .to(
+                  target,
+                  {
+                    x: -2,
+                    duration: .04
+                  }
+                )
+
+                .to(
+                  target,
+                  {
+                    x: 0,
+                    duration: .04
+                  }
+                );
+
+            },
+
+            4200
+          );
+
+      }
+
+
+      /* =======================================================
+         KONAMI CODE
+      ======================================================== */
+
+      const konami = [
+
+        "ArrowUp",
+        "ArrowUp",
+
+        "ArrowDown",
+        "ArrowDown",
+
+        "ArrowLeft",
+        "ArrowRight",
+
+        "ArrowLeft",
+        "ArrowRight",
+
+        "b",
+        "a"
+
+      ];
+
+
+      let keyIndex =
+        0;
+
+
+      window.addEventListener(
+        "keydown",
+        (event) => {
+
+          const key =
+            event.key.length === 1
+              ? event.key.toLowerCase()
+              : event.key;
+
+
+          if (
+            key ===
+            konami[keyIndex]
+          ) {
+
+            keyIndex++;
+
+
+            if (
+              keyIndex ===
+              konami.length
+            ) {
+
+              keyIndex =
+                0;
+
+
+              if (
+                !prefersReducedMotion &&
+                app
+              ) {
+
+                gsap.to(
+                  app,
+                  {
+                    rotation: 360,
+                    scale: .5,
+                    opacity: .5,
+                    duration: 1.2,
+                    ease:
+                      "power3.inOut",
+
+                    yoyo: true,
+                    repeat: 1,
+
+                    onComplete: () => {
+
+                      gsap.set(
+                        app,
+                        {
+                          rotation: 0,
+                          scale: 1,
+                          opacity: 1,
+                          clearProps:
+                            "transform"
+                        }
+                      );
+
+                    }
+
+                  }
+                );
+
+              }
+
+
+              alert(
+                "SİSTEM MESAJI\n\n" +
+                "Easter egg bulundu.\n\n" +
+                "Production veritabanı hâlâ güvende.\n\n" +
+                "Şimdilik."
+              );
+
+            }
+
+          } else {
+
+            keyIndex = 0;
+
+          }
+
+        }
+      );
+
+
+      /* =======================================================
+         CHATBOT
+      ======================================================== */
+
+      if (
+        chatbot &&
+        chatToggle &&
+        chatClose &&
+        chatInput &&
+        chatSend &&
+        chatMessages &&
+        notification
+      ) {
+
+        const botReplies = [
+
+          "Seni anladım ama cevap vermek istemiyorum.",
+
+          "Güzel soru. Gerçekten güzel. Cevabını biliyor muyum? Hayır. Vermek istiyor muyum? O da hayır.",
+
+          "İsteğin başarıyla alındı. İşlenmedi. Ama en azından loglara yazıldı.",
+
+          "Bu soruyu değerlendirdim. Değerlendirme sonucum: sonra bakarız.",
+
+          "Bunu çözebilirim. Ama çözmek istemiyorum.",
+
+          "Lütfen biraz sonra tekrar deneyin. Ya da hiç denemeyin."
+
+        ];
+
+
+        function openChat() {
+
+          chatbot.classList.add(
+            "open"
+          );
+
+
+          chatToggle.setAttribute(
+            "aria-expanded",
+            "true"
+          );
+
+
+          chatToggle.setAttribute(
+            "aria-label",
+            "Chatbotu kapat"
+          );
+
+
+          notification.style.display =
+            "none";
+
+
+          if (
+            !prefersReducedMotion
+          ) {
+
+            gsap.fromTo(
+              chatToggle,
+              {
+                scale: 1
+              },
+              {
+                scale: 1.04,
+                duration: .18,
+                yoyo: true,
+                repeat: 1,
+                ease:
+                  "power2.out"
+              }
+            );
+
+          }
+
+
+          setTimeout(
+            () => {
+
+              chatInput.focus();
+
+            },
+
+            prefersReducedMotion
+              ? 0
+              : 250
+          );
+
+        }
+
+
+        function closeChat() {
+
+          chatbot.classList.remove(
+            "open"
+          );
+
+
+          chatToggle.setAttribute(
+            "aria-expanded",
+            "false"
+          );
+
+
+          chatToggle.setAttribute(
+            "aria-label",
+            "Chatbotu aç"
+          );
+
+        }
+
+
+        chatToggle.addEventListener(
+          "click",
+          () => {
+
+            if (
+              chatbot.classList.contains(
+                "open"
+              )
+            ) {
+
+              closeChat();
+
+            } else {
+
+              openChat();
+
+            }
+
+          }
+        );
+
+
+        chatClose.addEventListener(
+          "click",
+          closeChat
+        );
+
+
+        function addMessage(
+          message,
+          type
+        ) {
+
+          const wrapper =
+            document.createElement(
+              "div"
+            );
+
+
+          wrapper.className =
+            `chat-message ${type}`;
+
+
+          const bubble =
+            document.createElement(
+              "div"
+            );
+
+
+          bubble.className =
+            "chat-bubble";
+
+
+          const label =
+            document.createElement(
+              "span"
+            );
+
+
+          label.className =
+            "chat-label";
+
+
+          label.textContent =
+            type === "bot"
+              ? "BOT"
+              : "SEN";
+
+
+          const text =
+            document.createElement(
+              "span"
+            );
+
+
+          text.textContent =
+            message;
+
+
+          bubble.appendChild(
+            label
+          );
+
+
+          bubble.appendChild(
+            text
+          );
+
+
+          wrapper.appendChild(
+            bubble
+          );
+
+
+          chatMessages.appendChild(
+            wrapper
+          );
+
+
+          chatMessages.scrollTop =
+            chatMessages.scrollHeight;
+
+        }
+
+
+        function showTyping() {
+
+          const existing =
+            $("#chatTyping");
+
+
+          if (
+            existing
+          ) {
+
+            existing.remove();
+
+          }
+
+
+          const wrapper =
+            document.createElement(
+              "div"
+            );
+
+
+          wrapper.className =
+            "chat-message bot";
+
+
+          wrapper.id =
+            "chatTyping";
+
+
+          wrapper.innerHTML = `
+
+            <div class="chat-typing">
+
+              <i></i>
+              <i></i>
+              <i></i>
+
+            </div>
+
+          `;
+
+
+          chatMessages.appendChild(
+            wrapper
+          );
+
+
+          chatMessages.scrollTop =
+            chatMessages.scrollHeight;
+
+        }
+
+
+        function hideTyping() {
+
+          const typing =
+            $("#chatTyping");
+
+
+          if (
+            typing
+          ) {
+
+            typing.remove();
+
+          }
+
+        }
+
+
+        let chatRequestId =
+          0;
+
+
+        function sendChatMessage() {
+
+          const message =
+            chatInput.value.trim();
+
+
+          if (
+            !message ||
+            chatInput.disabled
+          ) {
+
+            return;
+
+          }
+
+
+          addMessage(
+            message,
+            "user"
+          );
+
+
+          chatInput.value =
+            "";
+
+
+          chatInput.disabled =
+            true;
+
+
+          chatSend.disabled =
+            true;
+
+
+          showTyping();
+
+
+          const currentRequestId =
+            ++chatRequestId;
+
+
+          const reply =
+            botReplies[
+            Math.floor(
+              Math.random() *
+              botReplies.length
+            )
+            ];
+
+
+          const responseDelay =
+            prefersReducedMotion
+              ? 0
+              : 850 +
+              Math.random() *
+              650;
+
+
+          setTimeout(
+            () => {
+
+              if (
+                currentRequestId !==
+                chatRequestId
+              ) {
+
+                return;
+
+              }
+
+
+              hideTyping();
+
+
+              addMessage(
+                reply,
+                "bot"
+              );
+
+
+              chatInput.disabled =
+                false;
+
+
+              chatSend.disabled =
+                false;
+
+
+              chatInput.focus();
+
+            },
+
+            responseDelay
+          );
+
+        }
+
+
+        chatSend.addEventListener(
+          "click",
+          sendChatMessage
+        );
+
+
+        chatInput.addEventListener(
+          "keydown",
+          (event) => {
+
+            if (
+              event.key ===
+              "Enter"
+            ) {
+
+              event.preventDefault();
+
+              sendChatMessage();
+
+            }
+
+
+            if (
+              event.key ===
+              "Escape"
+            ) {
+
+              closeChat();
+
+            }
+
+          }
+        );
+
+
+        /* =====================================================
+           CHATBOT İLK AÇILIŞ ANİMASYONU
+        ====================================================== */
+
+        if (
+          !prefersReducedMotion
+        ) {
+
+          setTimeout(
+            () => {
+
+              if (
+                !chatbot.classList.contains(
+                  "open"
+                )
+              ) {
+
+                gsap.fromTo(
+                  chatToggle,
+                  {
+                    scale: 1
+                  },
+                  {
+                    scale: 1.12,
+                    duration: .35,
+                    yoyo: true,
+                    repeat: 3,
+                    ease:
+                      "power2.inOut"
+                  }
+                );
+
+              }
+
+            },
+
+            5000
+
+          );
+
+        }
+
+      }
+
+
+      /* =======================================================
+         SAYFA KAPATILIRKEN TIMER TEMİZLE
+      ======================================================== */
+
+      window.addEventListener(
+        "pagehide",
+        () => {
+
+          clearInterval(
+            countdownInterval
+          );
+
+
+          if (
+            statusInterval
+          ) {
+
+            clearInterval(
+              statusInterval
+            );
+
+          }
+
+
+          if (
+            glitchInterval
+          ) {
+
+            clearInterval(
+              glitchInterval
+            );
+
+          }
+
+
+          if (
+            typingTimeout !== null
+          ) {
+
+            clearTimeout(
+              typingTimeout
+            );
+
+          }
+
+
+          if (
+            terminalResponseTimeout !== null
+          ) {
+
+            clearTimeout(
+              terminalResponseTimeout
+            );
+
+          }
+
+        }
+      );
+
+
+      /* =======================================================
+         TERMİNAL İLK AÇILIŞ
+      ======================================================== */
+
+      const initialTerminalBody =
+        document.querySelector(
+          "#terminalBody"
+        );
+
+
+      if (
+        initialTerminalBody
+      ) {
+
+        requestAnimationFrame(
+          () => {
+
+            /*
+             * İlk açılışta prompt kesinlikle
+             * terminalin en altında olsun.
+             *
+             * Cursor artık promptun içinde:
+             *
+             * samet@dev:~$▋
+             */
+            moveTypingPromptToBottom();
+
+          }
+        );
+
+      }
+
+
+    })();
+
+  </script>
+
+</body>
+
+</html>
